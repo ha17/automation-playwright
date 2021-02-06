@@ -1,4 +1,5 @@
 from playwright import sync_playwright
+import time
 import re
 
 #
@@ -33,10 +34,8 @@ with sync_playwright() as p:
         'desktop': '1440x1024' 
     }
 
-#    print(emulations['laptop'].split('x')[0])
-#    exit()
-# Todo: fix viewport emulation in the try block
-# Firefox mobile emulation?
+    # TODO: Screenshots not working now
+    # TODO: How to fix Firefox mobile emulation?
 
     for browser_type in browser_types:
         for emulation in emulations:
@@ -45,14 +44,22 @@ with sync_playwright() as p:
             try:
                 if emulation == 'laptop' or emulation == 'desktop':
                     splittedEmulation = emulations[emulation].split('x')
-                    context = browser.newContext(viewport={'width': splittedEmulation[0], 'height': splittedEmulation[1]})
+                    context = browser.newContext(viewport={'width': int(splittedEmulation[0]), 'height': int(splittedEmulation[1])})
                 else:
                     context = browser.newContext(**emulations[emulation])
-            except:
+            except Exception as e:
+                print(e)
                 continue
 
             page = context.newPage()
             page.goto(url)
-            page.waitForSelector('.ml-promotion-no-thanks')
-            page.screenshot(path=browser_type + '-' + emulation + '-' + urlPathed + '.png')
-    browser.close()
+            time.sleep(3)
+            ssPath = browser_type + '-' + emulation + '-' + urlPathed + '.png'
+            print(ssPath)
+            #page.screenshot(path=browser_type + '-' + emulation + '-' + urlPathed + '.png')
+            try:
+                page.screenshot(path=ssPath)
+            except Exception as e:
+                print(e)
+
+            browser.close()
