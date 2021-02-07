@@ -34,9 +34,6 @@ with sync_playwright() as p:
         'desktop': '1440x1024' 
     }
 
-    # TODO: Screenshots not working now
-    # TODO: How to fix Firefox mobile emulation?
-
     for browser_type in browser_types:
         for emulation in emulations:
             browser = browser_types[browser_type].launch(headless=False)
@@ -55,8 +52,7 @@ with sync_playwright() as p:
             page.goto(url)
             time.sleep(3)
             ssPath = browser_type + '-' + emulation + '-' + urlPathed + '.png'
-            print(ssPath)
-            #page.screenshot(path=browser_type + '-' + emulation + '-' + urlPathed + '.png')
+            page.screenshot(path=f'./{browser_type}-{emulation}-{urlPathed}.png')
             try:
                 page.screenshot(path=ssPath)
             except Exception as e:
