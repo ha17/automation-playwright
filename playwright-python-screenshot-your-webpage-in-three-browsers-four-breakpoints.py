@@ -1,6 +1,8 @@
 from playwright import sync_playwright
 import time
 import re
+import sys
+ 
 
 #
 # Demonstrates: 
@@ -11,8 +13,12 @@ import re
 #  - taking a screenshot
 #
 
-## Set this
-url = 'https://maps.google.com'
+try:
+    url = sys.argv[1]
+except Exception as e:
+    #print(e)
+    print("[[EXITING]] - Please pass in a url")
+    exit()
 
 
 ###
@@ -28,10 +34,11 @@ with sync_playwright() as p:
     }
 
     emulations    = {
-        'iphone': p.devices['iPhone 11 Pro'],
-        'ipad'  : p.devices['iPad Pro 11'],
-        'laptop': '1280x1024',
-        'desktop': '1440x1024' 
+        '1-iphone-emulation': p.devices['iPhone 11 Pro'],
+        '2-ipad-emulation'  : p.devices['iPad Pro 11'],
+        '3-laptop': '1280x1024',
+        '4-desktop': '1440x1024',
+        '5-hd-desktop': '1920x1080' 
     }
 
     for browser_type in browser_types:
@@ -39,7 +46,7 @@ with sync_playwright() as p:
             browser = browser_types[browser_type].launch(headless=False)
 
             try:
-                if emulation == 'laptop' or emulation == 'desktop':
+                if isinstance(emulations[emulation], str): # == 'laptop' or emulation == 'desktop' or emulation == 'hd-desktop':
                     splittedEmulation = emulations[emulation].split('x')
                     context = browser.newContext(viewport={'width': int(splittedEmulation[0]), 'height': int(splittedEmulation[1])})
                 else:
