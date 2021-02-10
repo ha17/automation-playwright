@@ -2,19 +2,19 @@ from playwright import sync_playwright
 import time
 import re
 import sys
- 
+
 
 #
-# Demonstrates: 
+# Demonstrates:
 #  - using browser context to viewport size and emulate phone/tablet/laptop/desktop widths
 #  - iterating through each supported browser
-#  - iterating through each supported breakpoint 
+#  - iterating through each supported breakpoint
 #  - waiting to proceed
 #  - taking a screenshot
 #
 
 try:
-    url = sys.argv[1]
+    url = sys.argv[1].strip()
 except Exception as e:
     #print(e)
     print("[[EXITING]] - Please pass in a url")
@@ -26,7 +26,7 @@ except Exception as e:
 urlPathed = re.sub('[^a-zA-Z-0-9]', '', url)
 
 with sync_playwright() as p:
-    
+
     browser_types = {
         "chrome": p.chromium,
         "firefox": p.firefox,
@@ -38,12 +38,12 @@ with sync_playwright() as p:
         '2-ipad-emulation'  : p.devices['iPad Pro 11'],
         '3-laptop': '1280x1024',
         '4-desktop': '1440x1024',
-        '5-hd-desktop': '1920x1080' 
+        '5-hd-desktop': '1920x1080'
     }
 
     for browser_type in browser_types:
         for emulation in emulations:
-            browser = browser_types[browser_type].launch(headless=False)
+            browser = browser_types[browser_type].launch() #headless=False)
 
             try:
                 if isinstance(emulations[emulation], str): # == 'laptop' or emulation == 'desktop' or emulation == 'hd-desktop':
@@ -57,9 +57,10 @@ with sync_playwright() as p:
 
             page = context.newPage()
             page.goto(url)
-            time.sleep(3)
+            time.sleep(7)
             ssPath = browser_type + '-' + emulation + '-' + urlPathed + '.png'
-            page.screenshot(path=f'./{browser_type}-{emulation}-{urlPathed}.png')
+            page.screenshot(path=f'./{browser_type}-{emulation}-{urlPathed}.png') #, full_page=True)
+
             try:
                 page.screenshot(path=ssPath)
             except Exception as e:
