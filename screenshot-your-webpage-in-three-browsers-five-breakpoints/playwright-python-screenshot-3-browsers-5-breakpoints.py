@@ -1,8 +1,10 @@
-from playwright import sync_playwright
+#from playwright import sync_playwright
+from playwright.sync_api import sync_playwright
 import time
 import re
 import sys
-
+import argparse
+parser = argparse.ArgumentParser()
 
 #
 # Demonstrates:
@@ -20,6 +22,9 @@ except Exception as e:
     print("[[EXITING]] - Please pass in a url")
     exit()
 
+# parser.add_argument("-full", "--fullpage", help="Screencap a full page or just above-the-fold?")
+# parser.add_argument("-url", "--urls", help="Single URL, or list of them")
+# args = parser.parse_args()
 
 ###
 
@@ -29,8 +34,8 @@ with sync_playwright() as p:
 
     browser_types = {
         "chrome": p.chromium,
-        "firefox": p.firefox,
-        "safari": p.webkit
+        # "firefox": p.firefox,
+        # "safari": p.webkit
     }
 
     emulations    = {
@@ -43,23 +48,26 @@ with sync_playwright() as p:
 
     for browser_type in browser_types:
         for emulation in emulations:
-            browser = browser_types[browser_type].launch() #headless=False)
+            browser = browser_types[browser_type].launch(headless=False)
 
             try:
-                if isinstance(emulations[emulation], str): # == 'laptop' or emulation == 'desktop' or emulation == 'hd-desktop':
+                if isinstance(emulations[emulation], str):
                     splittedEmulation = emulations[emulation].split('x')
-                    context = browser.newContext(viewport={'width': int(splittedEmulation[0]), 'height': int(splittedEmulation[1])})
+                    context = browser.new_context(viewport={'width': int(splittedEmulation[0]), 'height': int(splittedEmulation[1])})
                 else:
-                    context = browser.newContext(**emulations[emulation])
+                    context = browser.new_context(**emulations[emulation])
             except Exception as e:
                 print(e)
                 continue
 
-            page = context.newPage()
+            page = context.new_page()
             page.goto(url)
             time.sleep(7)
             ssPath = browser_type + '-' + emulation + '-' + urlPathed + '.png'
-            page.screenshot(path=f'./{browser_type}-{emulation}-{urlPathed}.png') #, full_page=True)
+            # if args.fullpage:
+            #     page.screenshot(path=f'./{browser_type}-{emulation}-{urlPathed}.png', full_page=True)
+            # else:
+            page.screenshot(path=f'./{browser_type}-{emulation}-{urlPathed}.png')
 
             try:
                 page.screenshot(path=ssPath)
