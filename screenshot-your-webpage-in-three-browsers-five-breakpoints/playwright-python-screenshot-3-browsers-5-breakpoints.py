@@ -29,13 +29,14 @@ except Exception as e:
 ###
 
 urlPathed = re.sub('[^a-zA-Z-0-9]', '', url)
+goHeadless = True #False
 
 with sync_playwright() as p:
 
     browser_types = {
         "chrome": p.chromium,
-        # "firefox": p.firefox,
-        # "safari": p.webkit
+        "firefox": p.firefox,
+        "safari": p.webkit
     }
 
     emulations    = {
@@ -48,7 +49,7 @@ with sync_playwright() as p:
 
     for browser_type in browser_types:
         for emulation in emulations:
-            browser = browser_types[browser_type].launch(headless=False)
+            browser = browser_types[browser_type].launch(headless=goHeadless)
 
             try:
                 if isinstance(emulations[emulation], str):
@@ -62,7 +63,7 @@ with sync_playwright() as p:
 
             page = context.new_page()
             page.goto(url)
-            time.sleep(7)
+            time.sleep(3)
             ssPath = browser_type + '-' + emulation + '-' + urlPathed + '.png'
             # if args.fullpage:
             #     page.screenshot(path=f'./{browser_type}-{emulation}-{urlPathed}.png', full_page=True)
